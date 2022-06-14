@@ -1,9 +1,11 @@
 import styled from 'styled-components'
 
 const Wrapper = styled.main`
+  padding:2rem;
   text-align: center;
+  flex-direction: column;
   img {
-    max-width: 600px;
+    max-width: 90vw;
     display: block;
     margin-bottom: 2rem;
   }
@@ -22,6 +24,11 @@ const Wrapper = styled.main`
     color: var(--primary-500);
     text-decoration: underline;
     text-transform: capitalize;
+  }
+  @media (min-width: 992px) {
+    img {
+      max-width: 900px;
+    }
   }
 `
 
