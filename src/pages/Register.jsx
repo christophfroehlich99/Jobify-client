@@ -2,6 +2,7 @@ import {useState, useEffect} from "react"
 import {Logo, FormRow, Alert} from "../components"
 import Wrapper from "../assets/wrappers/RegisterPage"
 import { useAppContext } from "../context/appContext"
+import {useNavigate} from "react-router-dom"
 
 const initialState = {
   name: "",
@@ -12,8 +13,10 @@ const initialState = {
 
 const Register = () => {
   const [values,SetValues] = useState(initialState)
-// global state
-const {isLoading,showAlert,displayAlert} = useAppContext()
+  const navigate = useNavigate()
+  const {user, isLoading, showAlert, displayAlert, registerUser, loginUser} = useAppContext()
+
+  
 
 
   const handleChange = (e) => {
@@ -27,8 +30,22 @@ const {isLoading,showAlert,displayAlert} = useAppContext()
       displayAlert()
       return
     }
-    console.log(values)
+    const currentUser = {name,email,password}
+    if(isMember){
+      loginUser(currentUser)
+    }
+    else{
+      registerUser(currentUser)
+    }
   }
+
+  useEffect(()=>{
+    if(user){
+      setTimeout(()=>{
+        navigate("/")
+      }, 3000)
+    }
+  },[user, navigate])
 
   const toggleMember = (e) => {
     e.preventDefault()
@@ -41,12 +58,6 @@ const {isLoading,showAlert,displayAlert} = useAppContext()
           <Logo />
           <h3>{values.isMember ? "Login" : "Register"}</h3>
           {showAlert && <Alert />}
-          <FormRow 
-            type="email"
-            name="email"
-            value={values.email} 
-            handleChange={handleChange}
-          />
           {!values.isMember&& <FormRow 
             type="text"
             name="name"
@@ -54,12 +65,18 @@ const {isLoading,showAlert,displayAlert} = useAppContext()
             handleChange={handleChange}
           />}
           <FormRow 
-            type="text"
+            type="email"
+            name="email"
+            value={values.email} 
+            handleChange={handleChange}
+          />
+          <FormRow 
+            type="password"
             name="password"
             value={values.password} 
             handleChange={handleChange}
           />
-          <button type="submit" onClick={onSubmit} className="btn btn-block">Submit</button>
+          <button type="submit" onClick={onSubmit} className="btn btn-block" disabled={isLoading}>Submit</button>
           <p>
           {values.isMember ? "Not a member yet ?" : "Already a member ?"}
           <button type="button" onClick={toggleMember} className="member-btn">{values.isMember ? "Register" : "Login"} </button>
