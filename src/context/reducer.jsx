@@ -106,15 +106,25 @@ const reducer = (state, action) => {
     }
   }
   if(action.type === UPDATE_USER_SUCCESS){
-    return{
+    return {
       ...state,
-      isLoading: false,
+      isLoading:false,
+      user: action.payload.user,
+      token: action.payload.token,
+      userLocation: action.payload.location,
+      jobLocation: action.payload.location,
+      showAlert: true,
+      alertType: "success",
+      alertText: "User Profile Updated! "
     }
   }
   if(action.type === UPDATE_USER_ERROR){
     return{
       ...state,
       isLoading: false,
+      showAlert: true,
+      alertType: "danger",
+      alertText: action.payload.msg
     }
   }
   throw new Error(`no such action :${action.type}`)
