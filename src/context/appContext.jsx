@@ -21,7 +21,8 @@ import {
     CREATE_JOB_SUCCESS,
     CREATE_JOB_ERROR,
     GET_JOBS_BEGIN,
-    GET_JOBS_SUCCESS
+    GET_JOBS_SUCCESS,
+    SET_EDIT_JOB
   } from "./actions"
 
 const token = localStorage.getItem("token")
@@ -219,8 +220,16 @@ const getJobs = async () => {
     clearAlert()
 }
 
-
-    return  (   
+const setEditJob = (id) => {
+    dispatch({type:SET_EDIT_JOB,payload : { id }})
+}
+const editJob = () => {
+    console.log('edit job')
+}
+const deleteJob = (id) => {
+    console.log(`delete job : ${id}`)
+}
+   return  (   
         <AppContext.Provider 
         value={{
             ...state, 
@@ -233,7 +242,10 @@ const getJobs = async () => {
             handleChange,
             clearValues,
             createJob,
-            getJobs
+            getJobs,
+            setEditJob,
+            deleteJob,
+            editJob
         }}>
             {children}
         </AppContext.Provider>
