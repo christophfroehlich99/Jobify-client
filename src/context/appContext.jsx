@@ -22,7 +22,13 @@ import {
     CREATE_JOB_ERROR,
     GET_JOBS_BEGIN,
     GET_JOBS_SUCCESS,
-    SET_EDIT_JOB
+    SET_EDIT_JOB,
+    DELETE_JOB_BEGIN,
+    EDIT_JOB_BEGIN,
+    EDIT_JOB_SUCCESS,
+    EDIT_JOB_ERROR,
+    SHOW_STATS_BEGIN,
+    SHOW_STATS_SUCCESS
   } from "./actions"
 
 const token = localStorage.getItem("token")
@@ -50,7 +56,9 @@ const initialState = {
     jobs:[],
     totalJobs: 0,
     page: 1,
-    numOfPages: 1
+    numOfPages: 1,
+    stats: {},
+    monthlyApplications: []
 }
 
 const AppContext = React.createContext()
@@ -223,11 +231,45 @@ const getJobs = async () => {
 const setEditJob = (id) => {
     dispatch({type:SET_EDIT_JOB,payload : { id }})
 }
-const editJob = () => {
-    console.log('edit job')
+
+const editJob = async() => {
+    dispatch({type:EDIT_JOB_BEGIN})
+    try {
+        const {position, company, jobLocation, jobType, status} = state
+        await authFetch.patch(`/jobs/${state.editJobId}`, {
+            company,position,jobLocation,status,jobType
+        })
+        dispatch({type:EDIT_JOB_SUCCESS})
+        dispatch({type:CLEAR_VALUES})
+        clearValues()
+    } catch (error) {
+        if(error.response.status === 401) return
+        dispatch({type:EDIT_JOB_ERROR, payload:{msg:error.response.data.msg}})
+    }
+    clearAlert()
 }
-const deleteJob = (id) => {
-    console.log(`delete job : ${id}`)
+
+const deleteJob = async (jobId) => {
+    dispatch({type:DELETE_JOB_BEGIN})
+    try {
+        await authFetch.delete(`jobs/${jobId}`)
+        getJobs()
+    } catch (error) {
+        console.log(error.response)
+        logoutUser()
+    }
+}
+
+const showStats = async () => {
+    dispatch({type:SHOW_STATS_BEGIN})
+    try {
+        const { data } = await authFetch('/jobs/stats')   
+        dispatch({type:SHOW_STATS_SUCCESS, payload:{stats: data.defaultStats, monthlyApplications:data.monthlyApplications}})
+    } catch (error) {
+        console.log(error)
+        //logoutUser()
+    }
+    clearAlert()
 }
    return  (   
         <AppContext.Provider 
@@ -245,7 +287,8 @@ const deleteJob = (id) => {
             getJobs,
             setEditJob,
             deleteJob,
-            editJob
+            editJob,
+            showStats
         }}>
             {children}
         </AppContext.Provider>
